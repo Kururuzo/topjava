@@ -173,7 +173,7 @@ public class UserMealsUtil {
 //                                )))
 //                .collect(Collectors.toList());
 
-// first attempt
+// first attempt, fail
 //        //two cycles and O(n2), not good :(
 //        List<UserMealWithExcess> caloriesByDays = meals.stream()
 //                .filter(userMeal -> TimeUtil.isBetweenInclusive(userMeal.getDateTime().toLocalTime(), startTime, endTime))
@@ -184,5 +184,6 @@ public class UserMealsUtil {
 //                                .reduce(0, Integer::sum) > caloriesPerDay))
 //                .collect(Collectors.toList());
 //        return caloriesByDays;
+
     }
 }
