@@ -9,10 +9,12 @@ import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static ru.javawebinar.topjava.util.TimeUtil.isBetweenInclusive;
 
 public class MealsUtil {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         List<Meal> meals = Arrays.asList(
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
