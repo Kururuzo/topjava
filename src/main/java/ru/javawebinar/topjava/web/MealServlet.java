@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealsDao;
 import ru.javawebinar.topjava.dao.MealsDaoMock;
 import ru.javawebinar.topjava.model.Meal;
@@ -14,67 +15,104 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
-    private MealsDao mealsDao = new MealsDaoMock();
+    private static final Logger log = getLogger(UserServlet.class);
+
+    private MealsDao mealsDao;
     private static final int CALORIES_PER_DAY = 2000;
 
-    //todo whether to use logging?
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            String action = request.getParameter("action");
-            if ("delete".equalsIgnoreCase(action)) {
-                int mealId = Integer.parseInt(request.getParameter("mealId"));
-                mealsDao.deleteMeal(mealId);
-                //TODO: whether to check the empty values while adding and changing. input types already do it...
-            } else if ("edit".equalsIgnoreCase(action)) {
-                int mealId = Integer.parseInt(request.getParameter("mealId"));
-                Meal editedMeal = mealsDao.getById(mealId);
-                request.setAttribute("editedMeal", editedMeal);
-                // TODO: 08.02.2020 if use edit on item "Еда на граничное значение" in description rendering only "Еда". Why ???
-            }
+    public void init() throws ServletException {
+        super.init();
+        mealsDao = MealsDaoMock.getInstance();
+    }
 
-            List<Meal> mealsList = mealsDao.selectAll();
-            List<MealTo> mealToList = MealsUtil.filteredByStreams(mealsList, LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
-            request.setAttribute("mealToList", mealToList);
-            request.getRequestDispatcher("/meals.jsp").forward(request, response);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+
+        log.debug("beginning " + methodName);
+        try {
+            if (request.getParameter("action") != null) {
+                log.debug(methodName + ", request parameter action presents");
+                String action = request.getParameter("action");
+                Long mealId = null;
+                if (action != null) {
+                    log.debug(methodName + ", action present, parsing mealId");
+                    mealId = Long.parseLong(request.getParameter("mealId"));
+                    log.debug(methodName + ", parsed mealId=" + mealId);
+                }
+
+                if ("delete".equalsIgnoreCase(action)) {
+                    log.debug(methodName + ", deleting mealId=" + mealId);
+                    if (!mealsDao.delete(mealId)) {
+                        log.error(methodName + ", id was not found. Meal not deleted.");
+                    }
+                } else if ("edit".equalsIgnoreCase(action)) {
+                    Meal editedMeal = mealsDao.getById(mealId);
+                    if (editedMeal == null) {
+                        log.error(methodName + ", meal was not found. id=null");
+                    }
+                    log.debug(methodName + ", setAttribute editedMeal for editing c" + mealId);
+                    request.setAttribute("editedMeal", editedMeal);
+                    // TODO: 08.02.2020 if use edit on item "Еда на граничное значение" in description rendering only "Еда". Why ???
+                }
+            } else {
+                log.debug(methodName + ", there was no  action parameter in request");
+            }
+            renderingMeals(request, response, methodName);
         } catch (Exception e) {
-            System.out.println("doGet error!"); //until logging
-//            e.printStackTrace();
+            log.error(methodName + " error! " + e);
         }
 //        response.sendRedirect("some error page");
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+        log.debug("beginning " + methodName);
         try {
             request.setCharacterEncoding("UTF-8");
-
+            log.debug(methodName + ", parsing localDateTime");
             LocalDateTime localDateTime = LocalDateTime.parse(
                     request.getParameter("dateTime"), DateTimeFormatter.ISO_DATE_TIME);
+            log.debug(methodName + ", parsing finished. localDateTime=" + localDateTime);
             String localDescription = request.getParameter("description");
+            log.debug(methodName + ", parsing calories");
             int localCalories = Integer.parseInt(request.getParameter("calories"));
+            log.debug(methodName + ", parsing finished. localCalories=" + localCalories);
 
             if (!request.getParameter("id").isEmpty()) {
+                log.debug(methodName + ", id is not empty. start parsing id");
                 long id = Long.parseLong(request.getParameter("id"));
-                mealsDao.edit(id, localDateTime, localDescription, localCalories);
+                log.debug(methodName + ", parsed id=" + id + ". Editing meal.");
+                mealsDao.edit(id, new Meal(id, localDateTime, localDescription, localCalories));
             } else {
-                mealsDao.createMeal(localDateTime, localDescription, localCalories);
+                log.debug(methodName + ", id in request param was empty. Creating new Meal");
+                mealsDao.create(new Meal(localDateTime, localDescription, localCalories));
             }
+            renderingMeals(request, response, methodName);
 
-            //todo next 4 strings are the same in doGet method. How improve?
-            List<Meal> mealsList = mealsDao.selectAll();
-            List<MealTo> mealToList = MealsUtil.filteredByStreams(mealsList, LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
-            request.setAttribute("mealToList", mealToList);
-            request.getRequestDispatcher("/meals.jsp").forward(request, response);
         } catch (Exception e) {
-            System.out.println("doPost error!"); //until logging
-//            e.printStackTrace();
+            log.error(methodName + " error! " + e);
         }
 //        response.sendRedirect("some error page");
 
+    }
+
+    private void renderingMeals(HttpServletRequest request, HttpServletResponse response, String methodName) throws ServletException, IOException {
+        log.debug(methodName + ", selecting All meals");
+        Collection<Meal> mealsList = mealsDao.selectAll();
+        log.debug(methodName + ", filtering meals");
+        List<MealTo> mealToList = MealsUtil.filteredByStreams(mealsList, LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
+        log.debug(methodName + ", setting Attribute \"mealToList\"");
+        request.setAttribute("mealToList", mealToList);
+        log.debug(methodName + ", redirect to meals.jsp");
+        request.getRequestDispatcher("/meals.jsp").forward(request, response);
     }
 }

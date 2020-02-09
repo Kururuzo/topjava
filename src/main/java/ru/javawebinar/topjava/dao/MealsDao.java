@@ -2,14 +2,12 @@ package ru.javawebinar.topjava.dao;
 
 import ru.javawebinar.topjava.model.Meal;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 
 public interface MealsDao {
-    List<Meal> selectAll();
-    void createMeal(LocalDateTime localDateTime, String localDescription, int localCalories);
-    Meal getById (long id);
-    void edit(long id, LocalDateTime localDateTime, String localDescription, int localCalories);
-    void deleteMeal(long id);
-
+    Collection<Meal> selectAll();
+    void create(Meal meal);
+    Meal getById (Long id);
+    void edit(Long id, Meal meal);
+    boolean delete(Long id);
 }
