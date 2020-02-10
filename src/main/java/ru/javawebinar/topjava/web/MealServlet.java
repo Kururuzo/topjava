@@ -22,97 +22,77 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(UserServlet.class);
-
     private MealsDao mealsDao;
     private static final int CALORIES_PER_DAY = 2000;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-        mealsDao = MealsDaoMock.getInstance();
+    public void init() {
+        mealsDao = new MealsDaoMock();
     }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-
-        log.debug("beginning " + methodName);
         try {
-            if (request.getParameter("action") != null) {
-                log.debug(methodName + ", request parameter action presents");
-                String action = request.getParameter("action");
-                Long mealId = null;
-                if (action != null) {
-                    log.debug(methodName + ", action present, parsing mealId");
-                    mealId = Long.parseLong(request.getParameter("mealId"));
-                    log.debug(methodName + ", parsed mealId=" + mealId);
-                }
+            log.trace("doGet params {}", request.getQueryString());
 
-                if ("delete".equalsIgnoreCase(action)) {
-                    log.debug(methodName + ", deleting mealId=" + mealId);
+            String action = request.getParameter("action");
+            log.debug("action={}", action);
+            if (action != null) {
+                action = action.toLowerCase();
+                Long mealId = Long.parseLong(request.getParameter("mealId"));
+                if ("delete".equals(action)) {
+                    log.debug("deleting {}", mealId);
                     if (!mealsDao.delete(mealId)) {
-                        log.error(methodName + ", id was not found. Meal not deleted.");
+                        log.error("id was not found while deleting. Meal was not deleted.");
                     }
-                } else if ("edit".equalsIgnoreCase(action)) {
+                } else if ("edit".equals(action)) {
+                    log.debug("editing {}", mealId);
                     Meal editedMeal = mealsDao.getById(mealId);
                     if (editedMeal == null) {
-                        log.error(methodName + ", meal was not found. id=null");
+                        log.error("meal was not found while editing. id=null");
                     }
-                    log.debug(methodName + ", setAttribute editedMeal for editing c" + mealId);
                     request.setAttribute("editedMeal", editedMeal);
-                    // TODO: 08.02.2020 if use edit on item "Еда на граничное значение" in description rendering only "Еда". Why ???
                 }
-            } else {
-                log.debug(methodName + ", there was no  action parameter in request");
             }
-            renderingMeals(request, response, methodName);
+            renderingMeals(request, response);
+            //TODO i dont know what else to refactor...
         } catch (Exception e) {
-            log.error(methodName + " error! " + e);
+            log.error("doGet error!", e);
         }
 //        response.sendRedirect("some error page");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        log.debug("beginning " + methodName);
         try {
             request.setCharacterEncoding("UTF-8");
-            log.debug(methodName + ", parsing localDateTime");
-            LocalDateTime localDateTime = LocalDateTime.parse(
+            Long id = request.getParameter("id").isEmpty() ? null : Long.parseLong(request.getParameter("id"));
+            LocalDateTime dateTime = LocalDateTime.parse(
                     request.getParameter("dateTime"), DateTimeFormatter.ISO_DATE_TIME);
-            log.debug(methodName + ", parsing finished. localDateTime=" + localDateTime);
-            String localDescription = request.getParameter("description");
-            log.debug(methodName + ", parsing calories");
-            int localCalories = Integer.parseInt(request.getParameter("calories"));
-            log.debug(methodName + ", parsing finished. localCalories=" + localCalories);
+            String description = request.getParameter("description");
+            /* TODO: 10.02.2020 if use edit on item "Еда на граничное значение" in description rendering only "Еда".
+            Your answer: В jsp возьми value в кавычки, все будет ок. And its WORKING!
+            Think, that problem was in encoding, but how it works!!!? */
+            int calories = Integer.parseInt(request.getParameter("calories"));
 
-            if (!request.getParameter("id").isEmpty()) {
-                log.debug(methodName + ", id is not empty. start parsing id");
-                long id = Long.parseLong(request.getParameter("id"));
-                log.debug(methodName + ", parsed id=" + id + ". Editing meal.");
-                mealsDao.edit(id, new Meal(id, localDateTime, localDescription, localCalories));
-            } else {
-                log.debug(methodName + ", id in request param was empty. Creating new Meal");
-                mealsDao.create(new Meal(localDateTime, localDescription, localCalories));
-            }
-            renderingMeals(request, response, methodName);
-
+            log.debug("Saving meal(id= {} dateTime={}, description={}, calories={})",
+                    id, dateTime, description, calories);
+            mealsDao.save(new Meal(id, dateTime, description, calories));
+            renderingMeals(request, response);
         } catch (Exception e) {
-            log.error(methodName + " error! " + e);
+            log.error("doPost error!", e);
         }
 //        response.sendRedirect("some error page");
 
     }
 
-    private void renderingMeals(HttpServletRequest request, HttpServletResponse response, String methodName) throws ServletException, IOException {
-        log.debug(methodName + ", selecting All meals");
+    private void renderingMeals(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        log.trace("rendering All meals");
         Collection<Meal> mealsList = mealsDao.selectAll();
-        log.debug(methodName + ", filtering meals");
         List<MealTo> mealToList = MealsUtil.filteredByStreams(mealsList, LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
-        log.debug(methodName + ", setting Attribute \"mealToList\"");
         request.setAttribute("mealToList", mealToList);
-        log.debug(methodName + ", redirect to meals.jsp");
+        log.debug("forwarding to meals.jsp");
         request.getRequestDispatcher("/meals.jsp").forward(request, response);
     }
 }

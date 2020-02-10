@@ -35,8 +35,8 @@
         <form name="addAndEditForm" action="meals" method="post">
             <input type="hidden" name="id" value=${editedMeal.id}>
             <td><input type="datetime-local" max='9999-12-31T23:59:59' name="dateTime" value=${editedMeal.dateTime}></td>
-            <td><input type="text" name="description" value=${editedMeal.description}></td>
-            <td><input type="number" name="calories" min='1' value=${editedMeal.calories}></td>
+            <td><input type="text" name="description" value="${editedMeal.description}"></td>
+            <td><input type="number" name="calories" min='1' max ='2147483647' value=${editedMeal.calories}></td>
             <td><input type="submit" value="Submit"></td>
             <td><input type="reset"></td>
         </form>

@@ -9,28 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MealsDaoMock implements MealsDao {
-    private static volatile MealsDaoMock instance;
     private Map<Long, Meal> meals = new ConcurrentHashMap<>();
     private AtomicLong counter = new AtomicLong(1);
 
-    private MealsDaoMock() {
-    }
-
-    public static MealsDaoMock getInstance() {
-        MealsDaoMock localInstance = instance;
-        if (localInstance == null) {
-            synchronized (MealsDaoMock.class) {
-                localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = new MealsDaoMock();
-                }
-            }
-        }
-        return localInstance;
-    }
-
     {
-        MealsUtil.MEALS_LIST.forEach(this::create);
+        MealsUtil.MEALS_LIST.forEach(this::save);
     }
 
     @Override
@@ -39,7 +22,7 @@ public class MealsDaoMock implements MealsDao {
     }
 
     @Override
-    public void create(Meal meal) {
+    public void save(Meal meal) {
         if (meal.getId() == null) {
             meal.setId(counter.getAndIncrement());
         }
@@ -51,20 +34,8 @@ public class MealsDaoMock implements MealsDao {
         return meals.getOrDefault(id, null);
     }
 
-    //todo whether to use synchronized?
-    @Override
-    public synchronized void edit(Long id, Meal meal) {
-        delete(id);
-        create(meal);
-    }
-
     @Override
     public boolean delete(Long id) {
-        if (meals.containsKey(id)) {
-            meals.remove(id);
-            return true;
-        } else {
-            return false;
-        }
+        return meals.remove(id) != null;
     }
 }
