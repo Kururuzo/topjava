@@ -31,7 +31,10 @@
             <td><a href="meals?action=delete&mealId=${mealTo.id}">Delete</a></td>
         </tr>
     </c:forEach>
+
+<%--    <c:if test = "${editedMeal != null}">--%>
     <tr>
+<%--        <jsp:useBean id="editedMeal" type="ru.javawebinar.topjava.model.Meal"/>--%>
         <form name="addAndEditForm" action="meals" method="post">
             <input type="hidden" name="id" value=${editedMeal.id}>
             <td><input type="datetime-local" max='9999-12-31T23:59:59' name="dateTime" value=${editedMeal.dateTime}></td>
@@ -41,6 +44,7 @@
             <td><input type="reset"></td>
         </form>
     </tr>
+<%--    </c:if>--%>
 </table>
 
 </body>

@@ -25,6 +25,7 @@ public class MealTo {
         return id;
     }
 
+    //don't delete getters, they are using in meals.jsp
     public LocalDateTime getDateTime() {
         return dateTime;
     }

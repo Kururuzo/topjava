@@ -31,7 +31,7 @@ public class MealsDaoMock implements MealsDao {
 
     @Override
     public Meal getById(Long id) {
-        return meals.getOrDefault(id, null);
+        return meals.get(id);
     }
 
     @Override
