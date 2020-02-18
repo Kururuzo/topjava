@@ -8,8 +8,8 @@ import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.Month;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +32,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        if (!repository.containsKey(userId)) {
-            repository.put(userId, new ConcurrentHashMap<>());
-        }
+        repository.computeIfAbsent(userId, integer -> new ConcurrentHashMap<>());
 
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
@@ -47,26 +45,27 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int mealId, int userId) {
-        return repository.get(userId).remove(mealId) != null;
+        return repository.get(userId) != null && repository.get(userId).remove(mealId) != null;
     }
 
     @Override
     public Meal get(int mealId, int userId) {
-        return repository.get(userId).getOrDefault(mealId, null);
+        return  repository.get(userId) == null ? null : repository.get(userId).get(mealId);
     }
+
 
     @Override
     public List<Meal> getAll(int userId) {
-        return repository.get(userId).values().stream()
-                .sorted(Comparator.comparing(Meal::getDate).reversed())
-                .collect(Collectors.toList());
+        return getAllFilteredByDate(userId, LocalDate.MIN, LocalDate.MAX);
     }
 
     @Override
-    public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate) {
-        return getAll(userId).stream()
+    public List<Meal> getAllFilteredByDate(int userId, LocalDate startDate, LocalDate endDate) {
+        return repository.get(userId).values().stream()
                 .filter(meal -> DateTimeUtil.isBetweenAllInclusive(meal.getDate(), startDate, endDate))
+                .sorted(Comparator.comparing(Meal::getDate).reversed())
                 .collect(Collectors.toList());
+
     }
 }
 
