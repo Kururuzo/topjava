@@ -20,20 +20,8 @@ public class DateTimeUtil {
         return str == null || str.isEmpty() ? time : LocalTime.parse(str);
     }
 
-    //Проверку isBetweenDate сделать в DateTimeUtil.
-    //Попробуйте использовать дженерики и объединить ее с isBetweenTime (см. Generics Tutorials)
-    public static <T extends Comparable<T>> boolean isBetweenAllInclusive(T lt, T startTime, T endTime) {
+    public static <T extends Comparable<T>> boolean isBetweenAnyDateAndTimeInclusive(T lt, T startTime, T endTime) {
         return lt.compareTo(startTime) >= 0 && lt.compareTo(endTime) <= 0;
     }
-
-    public static boolean isBetweenDate(LocalDate lt, LocalDate startTime, LocalDate endTime) {
-        return lt.compareTo(startTime) >= 0 && lt.compareTo(endTime) <= 0;
-    }
-
-    public static boolean isBetweenInclusive(LocalTime lt, LocalTime startTime, LocalTime endTime) {
-        return lt.compareTo(startTime) >= 0 && lt.compareTo(endTime) <= 0;
-    }
-
-
 }
 

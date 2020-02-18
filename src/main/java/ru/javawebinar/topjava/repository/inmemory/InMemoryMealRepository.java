@@ -57,12 +57,11 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAllFilteredByDate(int userId, LocalDate startDate, LocalDate endDate) {
-         return  repository.get(userId) == null ? Collections.EMPTY_LIST :
+         return  repository.get(userId) == null ? Collections.emptyList() :
                  repository.get(userId).values().stream()
-                 .filter(meal -> DateTimeUtil.isBetweenAllInclusive(meal.getDate(), startDate, endDate))
+                 .filter(meal -> DateTimeUtil.isBetweenAnyDateAndTimeInclusive(meal.getDate(), startDate, endDate))
                  .sorted(Comparator.comparing(Meal::getDate).reversed())
                  .collect(Collectors.toList());
-
     }
 }
 
