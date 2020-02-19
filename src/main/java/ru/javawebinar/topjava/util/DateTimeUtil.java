@@ -12,12 +12,14 @@ public class DateTimeUtil {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
 
-    public static LocalDate stringToDate (String str, LocalDate date) {
-        return str == null || str.isEmpty() ?  date : LocalDate.parse(str); //LocalDate.MIN
+    //input/output may be null
+    public static LocalDate stringToDate (String str) {
+        return str == null || str.isEmpty() ?  null : LocalDate.parse(str);
     }
 
-    public static LocalTime stringToTime (String str, LocalTime time) {
-        return str == null || str.isEmpty() ? time : LocalTime.parse(str);
+    //input/output may be null
+    public static LocalTime stringToTime (String str) {
+        return str == null || str.isEmpty() ? null : LocalTime.parse(str);
     }
 
     public static <T extends Comparable<T>> boolean isBetweenAnyDateAndTimeInclusive(T lt, T startTime, T endTime) {

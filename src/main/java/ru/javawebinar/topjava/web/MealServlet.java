@@ -40,7 +40,7 @@ public class MealServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
 
         String id = request.getParameter("id");
@@ -82,16 +82,16 @@ public class MealServlet extends HttpServlet {
                 break;
             case "filter":
                 LocalDate startDate = DateTimeUtil.stringToDate(
-                        request.getParameter("startDate"), LocalDate.MIN);
+                        request.getParameter("startDate"));
                 LocalDate endDate = DateTimeUtil.stringToDate(
-                        request.getParameter("endDate"), LocalDate.MAX);
+                        request.getParameter("endDate"));
                 LocalTime startTime = DateTimeUtil.stringToTime(
-                        request.getParameter("startTime"), LocalTime.MIN);
+                        request.getParameter("startTime"));
                 LocalTime endTime = DateTimeUtil.stringToTime(
-                        request.getParameter("endTime"), LocalTime.MAX);
+                        request.getParameter("endTime"));
 
                 request.setAttribute("meals",
-                        MealsUtil.getFilteredTos(mealRestController.getAll(startDate, endDate),
+                        MealsUtil.getFilteredTos(mealRestController.getAllFilteredByDate(startDate, endDate),
                                 MealsUtil.DEFAULT_CALORIES_PER_DAY, startTime, endTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;

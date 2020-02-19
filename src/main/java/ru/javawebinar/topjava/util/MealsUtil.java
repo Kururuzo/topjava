@@ -32,7 +32,10 @@ public class MealsUtil {
     }
 
     public static List<MealTo> getFilteredTos(Collection<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
-        return filteredByStreams(meals, caloriesPerDay, meal -> DateTimeUtil.isBetweenAnyDateAndTimeInclusive(meal.getTime(), startTime, endTime));
+        return filteredByStreams(meals, caloriesPerDay, meal ->
+                DateTimeUtil.isBetweenAnyDateAndTimeInclusive(meal.getTime(),
+                        startTime == null ? LocalTime.MIN : startTime,
+                        endTime == null ? LocalTime.MAX : endTime));
     }
 
     public static List<MealTo> filteredByStreams(Collection<Meal> meals, int caloriesPerDay, Predicate<Meal> filter) {

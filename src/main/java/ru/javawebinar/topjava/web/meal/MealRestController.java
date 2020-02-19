@@ -16,7 +16,7 @@ import java.util.List;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private MealService service;
 
@@ -24,9 +24,12 @@ public class MealRestController {
         this.service = service;
     }
 
-    public List<Meal> getAll(LocalDate startDate, LocalDate endDate){
+    public List<Meal> getAllFilteredByDate(LocalDate startDate, LocalDate endDate){
         log.info("getAll, authUserId={}, startDate={}, endDate={}", authUserId(), startDate, endDate);
-        return service.getAll(authUserId(), startDate, endDate);
+
+        return service.getAllFilteredByDate(authUserId(),
+                startDate == null ? LocalDate.MIN : startDate,
+                endDate == null ? LocalDate.MAX : endDate);
     }
 
     public List<Meal> getAll() {
