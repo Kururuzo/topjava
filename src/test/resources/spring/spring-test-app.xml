@@ -15,7 +15,6 @@
     <!-- Not necessary, already included with component-scan -->
     <!--<context:annotation-config/>-->
 
-    <import resource="spring-abstract-app.xml"/>
-    <context:component-scan base-package="ru.javawebinar.**.repository.jdbc"/>
+    <context:component-scan base-package="ru.javawebinar.**.repository.inmemory"/>
 
 </beans>

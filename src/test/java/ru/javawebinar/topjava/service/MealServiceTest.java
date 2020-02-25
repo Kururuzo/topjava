@@ -37,7 +37,6 @@ public class MealServiceTest {
     public void create() {
         Meal newMeal = getNewMeal();
         Meal created = mealService.create(newMeal, USER_ID);
-        System.out.println(created);
         Integer id = created.getId();
         newMeal.setId(id);
         assertMatch(created, newMeal);
@@ -60,9 +59,7 @@ public class MealServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void deleteAndNotFound() {
-        Integer id = USER_MEAL_02.getId();
-        mealService.delete(id, USER_ID);
-        mealService.get(id, USER_ID);
+        mealService.delete(1, USER_ID);
     }
 
     @Test(expected = NotFoundException.class)
@@ -108,6 +105,6 @@ public class MealServiceTest {
     @Test
     public void getAll() {
         assertMatch(mealService.getAll(USER_ID),
-                USER_MEAL_07, USER_MEAL_06, USER_MEAL_05, USER_MEAL_04, USER_MEAL_03, USER_MEAL_02,  USER_MEAL_01);
+                USER_MEAL_07, USER_MEAL_06, USER_MEAL_05, USER_MEAL_04, USER_MEAL_03, USER_MEAL_02, USER_MEAL_01);
     }
 }
