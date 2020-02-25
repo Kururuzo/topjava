@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -45,7 +46,11 @@ public class MealServiceTest {
                 USER_MEAL_07, USER_MEAL_06, USER_MEAL_05, USER_MEAL_04, USER_MEAL_03, USER_MEAL_02, USER_MEAL_01);
     }
 
-    //todo Have to create duplicateMealCreate ??? And how?
+    @Test(expected = DuplicateKeyException.class)
+    public void duplicateMealCreate() {
+        mealService.create(MealTestData.getNewMeal(), USER_ID);
+        mealService.create(MealTestData.getNewMeal(), USER_ID);
+    }
 
     @Test
     public void delete() {
