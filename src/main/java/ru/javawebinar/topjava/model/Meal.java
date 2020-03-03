@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.model;
 
+import org.hibernate.validator.constraints.Range;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -8,12 +10,22 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@NamedQueries({
+        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal meal WHERE meal.id=:id AND meal.user.id=:userId"),
+        @NamedQuery(name = Meal.ALL_SORTED_BY_DATE_TIME, query = "SELECT meals FROM Meal meals WHERE meals.user.id=:id AND meals.dateTime >=: startDate AND meals.dateTime <: endDate ORDER BY meals.dateTime DESC"),
+        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT meals FROM Meal meals WHERE meals.user.id=:id ORDER BY meals.dateTime DESC"),
+})
+
 @Entity
 @Table(name = "meals", uniqueConstraints =
         {@UniqueConstraint(columnNames = {"user_id", "date_time"},
                 name = "meals_unique_user_datetime_idx")})
 
 public class Meal extends AbstractBaseEntity {
+
+    public static final String DELETE = "Meal.delete";
+    public static final String ALL_SORTED_BY_DATE_TIME = "Meal.getAllSortedByDateTimeDesc";
+    public static final String ALL_SORTED = "Meal.getAllSortedDesc";
 
     @Column(name = "date_time", nullable = false)
     @NotNull
@@ -26,11 +38,11 @@ public class Meal extends AbstractBaseEntity {
 
     @Column(name = "calories", nullable = false)
     @NotNull
-    @Size(min = 1, max = 10_000)
+    @Range(min = 10, max = 10000)
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Meal() {
