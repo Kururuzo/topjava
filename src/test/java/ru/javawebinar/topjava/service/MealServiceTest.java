@@ -47,13 +47,13 @@ public class MealServiceTest {
         long start;
         @Override
         protected void starting(Description description) {
-            start = System.nanoTime();
+            start = System.currentTimeMillis();
             log.debug("Test name is {}", description.getMethodName());
         }
 
         @Override
         protected void finished(Description description) {
-            log.debug("Test duration is {} nanoseconds", System.nanoTime() - start);
+            log.debug("Test duration is {} milliseconds", System.currentTimeMillis() - start);
         }
     };
 
