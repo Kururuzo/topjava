@@ -22,19 +22,10 @@ import java.util.List;
 
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ContextConfiguration({
-        "classpath:spring/spring-app.xml",
-        "classpath:spring/spring-db.xml"
-})
-@RunWith(SpringRunner.class)
-@Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public class UserServiceTest {
+public abstract class UserServiceTest extends AbstractServiceTest {
 
     @Autowired
     private UserService service;
-    @Autowired
-    private UserRepository repository;
 
     @Autowired
     private CacheManager cacheManager;
@@ -61,7 +52,7 @@ public class UserServiceTest {
 
     public void delete() throws Exception {
         service.delete(USER_ID);
-        Assert.assertNull(repository.get(USER_ID));
+        Assert.assertNull(service.get(USER_ID));
     }
 
     @Test(expected = NotFoundException.class)
