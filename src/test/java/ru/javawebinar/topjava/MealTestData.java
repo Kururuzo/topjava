@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 
 import java.time.Month;
 import java.util.List;
@@ -26,8 +27,15 @@ public class MealTestData {
 
     public static final List<Meal> MEALS = List.of(MEAL7, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1);
 
+    public static final Meal ADMIN_MEAL1_WITH_USER = addUser(ADMIN_MEAL1, UserTestData.ADMIN);
+
     public static Meal getNew() {
         return new Meal(null, of(2020, Month.JUNE, 1, 18, 0), "Созданный ужин", 300);
+    }
+
+    public static Meal addUser (Meal meal, User user) {
+        meal.setUser(user);
+        return meal;
     }
 
     public static Meal getUpdated() {
