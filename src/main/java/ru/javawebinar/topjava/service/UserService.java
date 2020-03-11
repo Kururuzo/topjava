@@ -54,7 +54,7 @@ public class UserService {
         checkNotFoundWithId(repository.save(user), user.getId());
     }
 
-    public User getUserMeals(int id) throws NoSuchMethodException {
+    public User getUserMeals(int id) {
         return checkNotFoundWithId(repository.getUserWithMeals(id), id);
     }
 }

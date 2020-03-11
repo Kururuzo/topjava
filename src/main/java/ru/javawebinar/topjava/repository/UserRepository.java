@@ -20,7 +20,7 @@ public interface UserRepository {
 
     List<User> getAll();
 
-    default User getUserWithMeals(int id) throws NoSuchMethodException {
-        throw new NoSuchMethodException();
+    default User getUserWithMeals(int id) {
+        throw new UnsupportedOperationException();
     };
 }

@@ -48,7 +48,7 @@ public class MealService {
         return repository.save(meal, userId);
     }
 
-    public Meal getMealWithUser(int id, int userId) throws NoSuchMethodException {
+    public Meal getMealWithUser(int id, int userId) {
         return checkNotFoundWithId(repository.getMealWithUser(id, userId), id);
     };
 }
