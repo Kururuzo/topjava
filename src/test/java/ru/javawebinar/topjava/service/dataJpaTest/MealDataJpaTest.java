@@ -21,7 +21,6 @@ public class MealDataJpaTest extends MealServiceTest {
         USER_MATCHER.assertMatch(mealWithUser.getUser(), ADMIN);
     }
 
-
     @Test
     public void getMealwithUserNotFound() {
         Assert.assertThrows(NotFoundException.class, ()->{

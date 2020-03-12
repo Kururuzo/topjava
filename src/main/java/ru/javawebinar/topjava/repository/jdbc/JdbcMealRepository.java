@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
@@ -41,7 +42,7 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
     protected abstract T timeConverter(LocalDateTime dateTime);
 
     @Repository
-    @Profile("hsqldb")
+    @Profile(Profiles.HSQL_DB)
     public static class hsqldbJdbcRepository extends JdbcMealRepository<Timestamp> {
 
         public hsqldbJdbcRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -56,7 +57,7 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
     }
 
     @Repository
-    @Profile("postgres")
+    @Profile(Profiles.POSTGRES_DB)
     public static class postgresJdbcRepository extends JdbcMealRepository<LocalDateTime>  {
 
         public postgresJdbcRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
