@@ -37,13 +37,6 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     protected JpaUtil jpaUtil;
 
-    @Autowired
-    private Environment environment;
-
-    private boolean isJpaOrDataJpa() {
-        return environment.acceptsProfiles(Profiles.of(JPA, DATAJPA));
-    }
-
     @Before
     public void setUp() throws Exception {
         cacheManager.getCache("users").clear();
