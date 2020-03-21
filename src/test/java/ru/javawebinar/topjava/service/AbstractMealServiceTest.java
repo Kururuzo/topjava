@@ -25,30 +25,28 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Autowired
     protected MealService service;
-    @Autowired
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    private MealRepository repository;
 
     @Test
-    public void delete() throws Exception {
+    public void delete() {
         service.delete(MEAL1_ID, USER_ID);
-        Assert.assertNull(repository.get(MEAL1_ID, USER_ID));
+        Assert.assertThrows(NotFoundException.class,
+                () -> service.delete(MEAL1_ID, USER_ID));
     }
 
     @Test
-    public void deleteNotFound() throws Exception {
+    public void deleteNotFound(){
         Assert.assertThrows(NotFoundException.class,
                 () -> service.delete(1, USER_ID));
     }
 
     @Test
-    public void deleteNotOwn() throws Exception {
+    public void deleteNotOwn() {
         Assert.assertThrows(NotFoundException.class,
                 () -> service.delete(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
-    public void create() throws Exception {
+    public void create() {
         Meal newMeal = getNew();
         Meal created = service.create(newMeal, USER_ID);
         Integer newId = created.getId();
@@ -58,44 +56,44 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void get() throws Exception {
+    public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, ADMIN_MEAL1);
     }
 
     @Test
-    public void getNotFound() throws Exception {
+    public void getNotFound() {
         Assert.assertThrows(NotFoundException.class,
                 () -> service.get(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
-    public void getNotOwn() throws Exception {
+    public void getNotOwn() {
         Assert.assertThrows(NotFoundException.class,
                 () -> service.get(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
-    public void update() throws Exception {
+    public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), updated);
     }
 
     @Test
-    public void updateNotFound() throws Exception {
+    public void updateNotFound(){
         NotFoundException ex = Assert.assertThrows(NotFoundException.class,
                 () -> service.update(MEAL1, ADMIN_ID));
         Assert.assertEquals("Not found entity with id=" + MEAL1_ID, ex.getMessage());
     }
 
     @Test
-    public void getAll() throws Exception {
+    public void getAll(){
         MEAL_MATCHER.assertMatch(service.getAll(USER_ID), MEALS);
     }
 
     @Test
-    public void getBetweenInclusive() throws Exception {
+    public void getBetweenInclusive() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(
                 LocalDate.of(2020, Month.JANUARY, 30),
                 LocalDate.of(2020, Month.JANUARY, 30), USER_ID),
@@ -103,12 +101,12 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void getBetweenWithNullDates() throws Exception {
+    public void getBetweenWithNullDates(){
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), MEALS);
     }
 
     @Test
-    public void createWithException() throws Exception {
+    public void createWithException() {
         Assume.assumeTrue(isJpaOrDataJpa()); //skipped is OK
         validateRootCause(() -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "  ", 300), USER_ID), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new Meal(null, null, "Description", 300), USER_ID), ConstraintViolationException.class);
