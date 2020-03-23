@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.MealTestData;
+import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.AbstractUserServiceJpaTest;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -25,4 +26,5 @@ public class DataJpaUserServiceTest extends AbstractUserServiceJpaTest {
         Assert.assertThrows(NotFoundException.class,
                 () -> service.getWithMeals(1));
     }
+
 }

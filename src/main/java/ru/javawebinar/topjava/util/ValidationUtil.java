@@ -1,10 +1,29 @@
 package ru.javawebinar.topjava.util;
 
-
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
+import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.repository.jdbc.JdbcUserRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableValidator;
+import java.lang.reflect.Method;
+import java.util.Set;
+
 public class ValidationUtil {
+
+    private static Validator validator;
+    private static ExecutableValidator executableValidator;
+
+    static {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.usingContext().getValidator();
+        executableValidator = validatorFactory.getValidator().forExecutables();
+    }
+
 
     private ValidationUtil() {
     }
@@ -53,5 +72,35 @@ public class ValidationUtil {
             result = cause;
         }
         return result;
+    }
+
+    public static <T>void validateAndThrowError(T t) {
+        Set<ConstraintViolation<T>> validate = validator.validate(t);
+        if (!validate.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (ConstraintViolation<T> violation : validate) {
+                stringBuilder.append( t.getClass().getSimpleName() + " not valid")
+                        .append(String.format(
+                                "\n Внимание, ошибка! property: [%s], value: [%s], message: [%s]",
+                                violation.getPropertyPath(), violation.getInvalidValue(), violation.getMessage())
+                );
+            }
+            throw new IllegalArgumentException(stringBuilder.toString());
+        }
+    }
+
+    public static void checkByEmailArgs() throws NoSuchMethodException {
+//        JdbcUserRepository repository =
+
+        Method method = JdbcUserRepository.class.getMethod("getByEmail", String.class);
+//        executableValidator.validateConstructorParameters(JdbcUserRepository.class.getConstructor());
+
+//        Set<ConstraintViolation<EventHandler>> argsViolations = executableValidator
+//                .validateParameters(eventHandler, method, new Object[]{event});
+    }
+
+
+    public static void userValidateAndLog(User user) {
+
     }
 }

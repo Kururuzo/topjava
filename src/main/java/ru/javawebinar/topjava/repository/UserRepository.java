@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.repository;
 
 import ru.javawebinar.topjava.model.User;
 
+import javax.management.OperationsException;
 import java.util.List;
 
 public interface UserRepository {
@@ -20,6 +21,10 @@ public interface UserRepository {
     List<User> getAll();
 
     default User getWithMeals(int id) {
+        throw new UnsupportedOperationException();
+    }
+
+    default void deleteUserRoles(User user) {
         throw new UnsupportedOperationException();
     }
 }
