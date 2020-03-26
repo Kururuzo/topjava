@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -16,6 +17,7 @@ import ru.javawebinar.topjava.util.ValidationUtil;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
@@ -33,7 +35,6 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
-
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -55,33 +56,33 @@ public class JdbcUserRepository implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-            addRoles(user);
+
+//            addRoles(user);
         } else if (namedParameterJdbcTemplate.update(
                 "UPDATE users SET name=:name, email=:email, password=:password, " +
                         "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource) == 0) {
             return null;
         }
-
+        deleteRoles(user.getId());
+        addRoles(user);
         return user;
     }
 
     @Override
     @Transactional
-    public boolean delete(int id) {
+    public boolean delete(@NotNull int id) {
         return jdbcTemplate.update("DELETE FROM users WHERE id=?", id) != 0;
     }
 
     @Override
-    public User get(int id) throws IllegalArgumentException {
+    public User get(@NotNull int id) throws IllegalArgumentException {
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
-        return setRoles(DataAccessUtils.singleResult(users));
+        User user = DataAccessUtils.singleResult(users);
+        return user == null ? null : setRoles(user);
     }
 
     @Override
     public User getByEmail(@Email String email) throws IllegalArgumentException {
-//        checkByEmailArgs(email);
-
-//        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         return setRoles(DataAccessUtils.singleResult(users));
     }
@@ -108,7 +109,6 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     private void addRoles(User user) {
-        ValidationUtil.validateAndThrowError(user);
         Set<Role> roles = user.getRoles();
         String sql = "INSERT INTO user_roles (user_id, role) VALUES (?, ?)";
 
@@ -132,21 +132,14 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     private User setRoles(User user) {
-        ValidationUtil.validateAndThrowError(user);
-//        if (user == null) return user; //validator throws Ex
-        String setRolesSql = "SELECT * FROM user_roles WHERE user_id = ?";
-        Object[] objects = {user.getId()};
-
-        List<Role> roles = jdbcTemplate.query(setRolesSql, objects,
-                (rs, rowNum) -> Role.valueOf(rs.getString("role")));
+        String setRolesSql = "SELECT role FROM user_roles WHERE user_id = ?";
+        List<Role> roles = jdbcTemplate.queryForList(setRolesSql, new Object[]{user.getId()}, Role.class);
         user.setRoles(roles);
         return user;
     }
 
-    @Override
-    public void deleteUserRoles(User user) {
-        ValidationUtil.validateAndThrowError(user);
-        jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", user.getId());
+    public void deleteRoles(@NotNull int userId) {
+        jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", userId);
     }
 
 //    public void checkByEmailArgs(String email) {
@@ -161,9 +154,9 @@ public class JdbcUserRepository implements UserRepository {
 //        } catch (NoSuchMethodException e) {
 //            e.printStackTrace();
 //        }
-//
-////        Set<ConstraintViolation<EventHandler>> argsViolations = executableValidator
-////                .validateParameters(eventHandler, method, new Object[]{event});
+
+//        Set<ConstraintViolation<EventHandler>> argsViolations = executableValidator
+//                .validateParameters(eventHandler, method, new Object[]{event});
 //    }
 
 }

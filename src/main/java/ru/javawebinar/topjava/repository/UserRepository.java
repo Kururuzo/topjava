@@ -24,7 +24,4 @@ public interface UserRepository {
         throw new UnsupportedOperationException();
     }
 
-    default void deleteUserRoles(User user) {
-        throw new UnsupportedOperationException();
-    }
 }

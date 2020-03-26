@@ -24,6 +24,8 @@ public abstract class AbstractUserServiceJpaTest extends AbstractUserServiceTest
     public void setUp() {
         cacheManager.getCache("users").clear();
         jpaUtil.clear2ndLevelHibernateCache();
+        evictAllCaches();
+
     }
 
     @Test
@@ -34,5 +36,11 @@ public abstract class AbstractUserServiceJpaTest extends AbstractUserServiceTest
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.ROLE_USER)), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "password", 9, true, new Date(), Set.of())), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "password", 10001, true, new Date(), Set.of())), ConstraintViolationException.class);
+    }
+
+    public void evictAllCaches(){
+        for(String name : cacheManager.getCacheNames()){
+            cacheManager.getCache(name).clear();
+        }
     }
 }

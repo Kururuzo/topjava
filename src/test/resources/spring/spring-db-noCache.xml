@@ -1,0 +1,16 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <beans profile="jpa,datajpa">
+        <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
+            <property name="properties">
+                <map>
+                    <entry key="org.hibernate.cfg.AvailableSettings" value="false"/>
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+</beans>

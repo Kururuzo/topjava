@@ -49,15 +49,14 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-//    @Test(expected = IllegalArgumentException.class)
     public void getNotFound() throws Exception {
         service.get(1);
     }
 
     @Test
     public void getByEmail() {
-        User user = service.getByEmail("user@yandex.ru");
-        USER_MATCHER.assertMatch(user, USER);
+        User user = service.getByEmail("admin@gmail.com");
+        USER_MATCHER.assertMatch(user, ADMIN);
     }
 
     @Test

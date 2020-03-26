@@ -1,27 +1,21 @@
 package ru.javawebinar.topjava.util;
 
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
-import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.repository.jdbc.JdbcUserRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.executable.ExecutableValidator;
-import java.lang.reflect.Method;
 import java.util.Set;
 
 public class ValidationUtil {
 
     private static Validator validator;
-    private static ExecutableValidator executableValidator;
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.usingContext().getValidator();
-        executableValidator = validatorFactory.getValidator().forExecutables();
     }
 
 
@@ -87,20 +81,5 @@ public class ValidationUtil {
             }
             throw new IllegalArgumentException(stringBuilder.toString());
         }
-    }
-
-    public static void checkByEmailArgs() throws NoSuchMethodException {
-//        JdbcUserRepository repository =
-
-        Method method = JdbcUserRepository.class.getMethod("getByEmail", String.class);
-//        executableValidator.validateConstructorParameters(JdbcUserRepository.class.getConstructor());
-
-//        Set<ConstraintViolation<EventHandler>> argsViolations = executableValidator
-//                .validateParameters(eventHandler, method, new Object[]{event});
-    }
-
-
-    public static void userValidateAndLog(User user) {
-
     }
 }

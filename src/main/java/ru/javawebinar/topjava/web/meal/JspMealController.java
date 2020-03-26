@@ -28,7 +28,7 @@ public class JspMealController extends AbstractMealController{
     }
 
     @GetMapping()
-    public String getAllMeals(Model model) {
+    public String getAll(Model model) {
 //        model.addAttribute("meals", MealsUtil.getTos(service.getAll(userId), SecurityUtil.authUserCaloriesPerDay()));
         model.addAttribute("meals", super.getAll());
         return "meals";

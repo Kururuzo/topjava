@@ -57,7 +57,4 @@ public class UserService {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
     }
 
-    public void deleteUserRoles(User user) {
-        repository.deleteUserRoles(user);
-    }
 }
