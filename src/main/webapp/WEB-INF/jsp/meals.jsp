@@ -10,43 +10,46 @@
 
 <jsp:include page="fragments/bodyHeader.jsp"/>
 
-<section>
+<%--<section>--%>
 
     <div class="jumbotron pt-4">
         <div class="container">
             <h3 class="text-center"><spring:message code="meal.title"/></h3>
+                <div class="card-footer border-dark">
+                    <div class="card-body">
+                        <form id="filterForm">
+                            <div class="row">
+                                <div class="col-2">
+                                    <label for="startDate"><spring:message code="meal.startDate"/></label>
+                                    <input type="date" id="startDate" name="startDate">
+                                </div>
+                                <div class="col-2">
+                                    <label for="endDate"><spring:message code="meal.endDate"/></label>
+                                    <input type="date" id="endDate" name="endDate">
+                                </div>
+                                <div class="col-2">
+                                    <label for="startTime"><spring:message code="meal.startTime"/></label>
+                                    <input type="time" id="startTime" name="startTime">
+                                </div>
+                                <div class="col-2">
+                                    <label for="endTime"><spring:message code="meal.endTime"/></label>
+                                    <input type="time" id="endTime" name="endTime">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-danger" onclick="cleanFilter()">
+                            <span class="fa fa-remove"></span>
+                            <spring:message code="common.cancel"/>
+                        </button>
 
-
-<%--            <form id="filterForm" method="get" action="meals/filter">--%>
-            <form id="filterForm">
-                <dl>
-                    <dt><spring:message code="meal.startDate"/>:</dt>
-                    <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
-                </dl>
-                <dl>
-                    <dt><spring:message code="meal.endDate"/>:</dt>
-                    <dd><input type="date" name="endDate" value="${param.endDate}"></dd>
-                </dl>
-                <dl>
-                    <dt><spring:message code="meal.startTime"/>:</dt>
-                    <dd><input type="time" name="startTime" value="${param.startTime}"></dd>
-                </dl>
-                <dl>
-                    <dt><spring:message code="meal.endTime"/>:</dt>
-                    <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
-                </dl>
-
-                <button class="btn btn-danger" onclick="cleanFilter()">
-                    <span class="fa fa-remove"></span>
-                    <spring:message code="common.cancel"/>
-                </button>
-
-                <button class="btn btn-primary" onclick="filter()">
-                    <span class="fa fa-filter"></span>
-                    <spring:message code="meal.filter"/>
-                </button>
-                <%--                <button type="submit"><spring:message code="meal.filter"/></button>--%>
-            </form>
+                        <button class="btn btn-primary" onclick="filter()">
+                            <span class="fa fa-filter"></span>
+                            <spring:message code="meal.filter"/>
+                        </button>
+                    </div>
+                </div>
             <hr>
 
 
@@ -87,7 +90,7 @@
 
         </div>
     </div>
-</section>
+<%--</section>--%>
 
 <div class="modal fade" tabindex="-1" id="editRow">
     <div class="modal-dialog">

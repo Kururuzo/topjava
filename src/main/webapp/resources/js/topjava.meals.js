@@ -30,10 +30,10 @@ $(function () {
                         "desc"
                     ]
                 ]
-            })
+            }),
+            updateTable: filter
         }
     );
-    filter();
 });
 
 
@@ -41,31 +41,17 @@ function filter() {
     $.ajax({
         type: "GET",
         url: "ajax/meals/filter",
-        data: $('#filterForm').serialize(),
-        cache: false,
-        dataType: 'json',
-    }).done(reload);
-
-    function reload(data) {
-        context.datatableApi.clear().rows.add(data).draw();
-    }
+        data: $('#filterForm').serialize()
+    }).done(reload); // in topjava.common.js
 }
 
-
 function cleanFilter() {
-    // why don't work???
     //https://qna.habr.com/q/214378
-    // $('#filterForm')[0].reset();
+    $('#filterForm')[0].reset();
 
-    $('input')[0].value = '';
-    $('input')[1].value = '';
-    $('input')[2].value = '';
-    $('input')[3].value = '';
     $.ajax({
         type: "GET",
         url: "ajax/meals/",
-    }).done(function (data) {
-        context.datatableApi.clear().rows.add(data).draw();
-    });
+    }).done(reload); // in topjava.common.js
     successNoty("Filter cleared");
 }

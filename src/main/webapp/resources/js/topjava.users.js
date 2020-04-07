@@ -36,7 +36,15 @@ $(function () {
                         "asc"
                     ]
                 ]
-            })
+            }),
+        updateTable: filter
         }
     );
+    // updateTable: filter
 });
+
+function filter() {
+    $.get(context.ajaxUrl, function (data) {
+        reload(data);
+    });
+}
