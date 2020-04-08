@@ -43,3 +43,13 @@ body {
     line-height: 60px; /* Vertically center the text there */
     background-color: #f5f5f5;
 }
+
+
+/*http://www.codeharmony.ru/materials/42, p. 15 */
+tr[data-isActive="false"] {
+    opacity: .3;
+}
+
+.unchecked {
+    opacity: .3;
+}

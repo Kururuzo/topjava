@@ -48,3 +48,21 @@ function filter() {
         reload(data);
     });
 }
+
+function isActive(userId) {
+    let checkBox = $('#' + userId);
+
+    //todo to closest, like https://stackoverflow.com/questions/10499435/parent-vs-closest
+    let checkBoxTrParent = $(checkBox.parent().parent());
+
+    if (checkBox[0].checked == true){
+        checkBoxTrParent.attr("data-isActive", "true")
+
+        // alert('checked');
+    } else {
+        checkBoxTrParent.attr("data-isActive", "false")
+
+        // console.log('checkBox = %s, checkBox.checked = %s, checkBoxTrParent = %s',
+        //     checkBox, checkBox.checked, checkBoxTrParent[0])
+    }
+};
