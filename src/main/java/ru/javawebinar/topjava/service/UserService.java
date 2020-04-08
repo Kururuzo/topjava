@@ -56,4 +56,12 @@ public class UserService {
     public User getWithMeals(int id) {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
     }
+
+    @CacheEvict(value = "users", allEntries = true)
+    public void setActive(int id, boolean enable) {
+        User user = repository.get(id);
+        Assert.notNull(user, "user must not be null");
+        user.setEnabled(enable);
+        checkNotFoundWithId(repository.save(user), user.id());
+    }
 }

@@ -51,18 +51,19 @@ function filter() {
 
 function isActive(userId) {
     let checkBox = $('#' + userId);
+    let checkBoxStatus = checkBox[0].checked; //its a new status of checkbox !
 
     //todo to closest, like https://stackoverflow.com/questions/10499435/parent-vs-closest
     let checkBoxTrParent = $(checkBox.parent().parent());
 
-    if (checkBox[0].checked == true){
-        checkBoxTrParent.attr("data-isActive", "true")
-
-        // alert('checked');
-    } else {
-        checkBoxTrParent.attr("data-isActive", "false")
-
-        // console.log('checkBox = %s, checkBox.checked = %s, checkBoxTrParent = %s',
-        //     checkBox, checkBox.checked, checkBoxTrParent[0])
-    }
+    //Must be Patch, but don't work. Why??
+    $.ajax({
+        url: "ajax/admin/users/" + userId,
+        type: "POST",
+        data: "checkBoxStatus=" + checkBoxStatus
+    }).done(function () {
+        checkBoxTrParent.attr("data-isActive", checkBoxStatus);
+        // console.log('checkBoxStatus = %s', checkBoxStatus);
+        successNoty("Status changed");
+    });
 };

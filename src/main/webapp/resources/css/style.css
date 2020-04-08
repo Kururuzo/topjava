@@ -47,9 +47,5 @@ body {
 
 /*http://www.codeharmony.ru/materials/42, p. 15 */
 tr[data-isActive="false"] {
-    opacity: .3;
-}
-
-.unchecked {
-    opacity: .3;
+    opacity: .2;
 }
