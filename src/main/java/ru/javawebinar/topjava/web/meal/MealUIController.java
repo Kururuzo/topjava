@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.ErrorUtil;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -45,11 +46,7 @@ public class MealUIController extends AbstractMealController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult result) {
         if (result.hasErrors()) {
-            StringJoiner joiner = new StringJoiner("<br>");
-            result.getFieldErrors().forEach(
-                    fe -> joiner.add(String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-            );
-            return ResponseEntity.unprocessableEntity().body(joiner.toString());
+            return ErrorUtil.responseForControllers(result);
         }
         if (meal.isNew()) {
             super.create(meal);
