@@ -7,6 +7,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +22,14 @@ import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -46,6 +57,41 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
 
+    //Variant 2
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    public ErrorInfo methodArgumentNotValidError(HttpServletRequest req, Exception e) {
+        BindingResult bindingResult = null;
+        if (e instanceof MethodArgumentNotValidException) {
+            bindingResult = ((MethodArgumentNotValidException) e).getBindingResult();
+        } else if (e instanceof BindException) {
+            bindingResult =((BindException) e).getBindingResult();
+        }
+
+        //https://stackoverflow.com/questions/2751603/how-to-get-error-text-in-controller-from-bindingresult
+        //NPE? - have i anything do with them?
+        String[] info = bindingResult.getFieldErrors().stream()
+                .map(fieldError -> "<br>[".concat(fieldError.getField()).concat("] ").concat(fieldError.getDefaultMessage()))
+                .toArray(String[]::new);
+
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, info);
+    }
+
+//    //Variant 1, no validation for REST
+//    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+//    @ExceptionHandler({TransactionSystemException.class})
+//    public ErrorInfo constraintViolationError(HttpServletRequest req, Exception e) {
+//        Throwable rootCause = ((TransactionSystemException) e).getRootCause();
+//        if (rootCause instanceof ConstraintViolationException) {
+//            String[] info = (((ConstraintViolationException) rootCause).getConstraintViolations()).stream()
+//                    .map(cv -> "<br>[".concat(cv.getPropertyPath().toString()).concat("] ").concat(cv.getMessage()))
+//                    .toArray(String[]::new);
+////            return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, info);
+//            return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, info);
+//        }
+//        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
+//    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorInfo handleError(HttpServletRequest req, Exception e) {
@@ -53,13 +99,14 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, String...info) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), errorType,
+                info.length == 0 ? new String[]{rootCause.toString()} : info);
     }
 }
