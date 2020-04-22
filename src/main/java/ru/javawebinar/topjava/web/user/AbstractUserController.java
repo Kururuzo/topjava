@@ -24,7 +24,7 @@ public abstract class AbstractUserController {
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
-        binder.setValidator(emailValidator);
+        binder.addValidators(emailValidator);
     }
 
     @Autowired
